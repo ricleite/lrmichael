@@ -12,15 +12,15 @@ CXXFLAGS=-shared -fPIC -mcx16 -std=gnu++14 -O2 -Wall $(DFLAGS)
 
 LDFLAGS=-ldl -pthread $(DFLAGS)
 
-FILES=lfmalloc.cpp size_classes.cpp pages.cpp pagemap.cpp
+FILES=lrmichael.cpp size_classes.cpp pages.cpp pagemap.cpp
 
-default: lfmalloc.so lfmalloc.a
+default: lrmichael.so lrmichael.a
 
-lfmalloc.so: $(FILES)
-	$(CCX) $(LDFLAGS) $(CXXFLAGS) -o lfmalloc.so $(FILES)
+lrmichael.so: $(FILES)
+	$(CCX) $(LDFLAGS) $(CXXFLAGS) -o lrmichael.so $(FILES)
 
-lfmalloc.a: lfmalloc.so
-	ar rcs lfmalloc.a lfmalloc.so
+lrmichael.a: lrmichael.so
+	ar rcs lrmichael.a lrmichael.so
 
 clean:
 	rm -f *.so *.o *.a

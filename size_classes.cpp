@@ -1,7 +1,7 @@
 
 #include "defines.h"
 #include "size_classes.h"
-#include "lfmalloc.h"
+#include "lrmichael.h"
 
 #define SIZE_CLASSES \
   /* index, lg_grp, lg_delta, ndelta, psz, bin, pgs, lg_delta_lookup */ \
@@ -326,6 +326,18 @@ void InitSizeClass()
 
         // increase superblock size so it can hold >1 elements
         while (blockSize >= sbSize)
+            sbSize += sc.sbSize;
+
+        sc.sbSize = sbSize;
+    }
+
+    // increase superblock size if need
+    for (size_t scIdx = 1; scIdx < MAX_SZ_IDX; ++scIdx)
+    {
+        SizeClassData& sc = SizeClasses[scIdx];
+        size_t sbSize = sc.sbSize;
+        // 2MB
+        while (sbSize < (PAGE * 512))
             sbSize += sc.sbSize;
 
         sc.sbSize = sbSize;

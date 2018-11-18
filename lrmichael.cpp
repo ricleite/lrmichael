@@ -7,7 +7,7 @@
 // for ENOMEM
 #include <errno.h>
 
-#include "lfmalloc.h"
+#include "lrmichael.h"
 #include "size_classes.h"
 #include "pages.h"
 #include "pagemap.h"
@@ -490,7 +490,7 @@ ProcHeap* GetProcHeap(size_t size)
 }
 
 extern "C"
-void* lf_malloc(size_t size) noexcept
+void* lr_malloc(size_t size) noexcept
 {
     LOG_DEBUG("size: %lu", size);
 
@@ -546,7 +546,7 @@ void* lf_malloc(size_t size) noexcept
 }
 
 extern "C"
-void* lf_calloc(size_t n, size_t size) noexcept
+void* lr_calloc(size_t n, size_t size) noexcept
 {
     LOG_DEBUG();
     size_t allocSize = n * size;
@@ -555,7 +555,7 @@ void* lf_calloc(size_t n, size_t size) noexcept
     if (UNLIKELY(n == 0 || allocSize / n != size))
         return nullptr;
 
-    void* ptr = lf_malloc(allocSize);
+    void* ptr = lr_malloc(allocSize);
 
     // calloc returns zero-filled memory
     // @todo: optimize, memory may be already zero-filled 
@@ -567,10 +567,10 @@ void* lf_calloc(size_t n, size_t size) noexcept
 }
 
 extern "C"
-void* lf_realloc(void* ptr, size_t size) noexcept
+void* lr_realloc(void* ptr, size_t size) noexcept
 {
     LOG_DEBUG();
-    void* newPtr = lf_malloc(size);
+    void* newPtr = lr_malloc(size);
     if (LIKELY(ptr && newPtr))
     {
         Descriptor* desc = GetDescriptorForPtr(ptr);
@@ -582,12 +582,12 @@ void* lf_realloc(void* ptr, size_t size) noexcept
         memcpy(newPtr, ptr, blockSize);
     }
 
-    lf_free(ptr);
+    lr_free(ptr);
     return newPtr;
 }
 
 extern "C"
-size_t lf_malloc_usable_size(void* ptr) noexcept
+size_t lr_malloc_usable_size(void* ptr) noexcept
 {
     LOG_DEBUG();
     if (UNLIKELY(ptr == nullptr))
@@ -598,7 +598,7 @@ size_t lf_malloc_usable_size(void* ptr) noexcept
 }
 
 extern "C"
-int lf_posix_memalign(void** memptr, size_t alignment, size_t size) noexcept
+int lr_posix_memalign(void** memptr, size_t alignment, size_t size) noexcept
 {
     LOG_DEBUG();
     // @todo: this is so very inefficient
@@ -627,11 +627,11 @@ int lf_posix_memalign(void** memptr, size_t alignment, size_t size) noexcept
 }
 
 extern "C"
-void* lf_aligned_alloc(size_t alignment, size_t size) noexcept
+void* lr_aligned_alloc(size_t alignment, size_t size) noexcept
 {
     LOG_DEBUG();
     void* ptr = nullptr;
-    int ret = lf_posix_memalign(&ptr, alignment, size);
+    int ret = lr_posix_memalign(&ptr, alignment, size);
     if (ret)
         return nullptr;
 
@@ -639,29 +639,29 @@ void* lf_aligned_alloc(size_t alignment, size_t size) noexcept
 }
 
 extern "C"
-void* lf_valloc(size_t size) noexcept
+void* lr_valloc(size_t size) noexcept
 {
     LOG_DEBUG();
-    return lf_aligned_alloc(PAGE, size);
+    return lr_aligned_alloc(PAGE, size);
 }
 
 extern "C"
-void* lf_memalign(size_t alignment, size_t size) noexcept
+void* lr_memalign(size_t alignment, size_t size) noexcept
 {
     LOG_DEBUG();
-    return lf_aligned_alloc(alignment, size);
+    return lr_aligned_alloc(alignment, size);
 }
 
 extern "C"
-void* lf_pvalloc(size_t size) noexcept
+void* lr_pvalloc(size_t size) noexcept
 {
     LOG_DEBUG();
     size = ALIGN_ADDR(size, PAGE);
-    return lf_aligned_alloc(PAGE, size);
+    return lr_aligned_alloc(PAGE, size);
 }
 
 extern "C"
-void lf_free(void* ptr) noexcept
+void lr_free(void* ptr) noexcept
 {
     LOG_DEBUG("ptr: %p", ptr);
     if (UNLIKELY(!ptr))
@@ -706,6 +706,7 @@ void lf_free(void* ptr) noexcept
         // after CAS, desc might become empty and
         //  concurrently reused, so store maxcount
         uint64_t maxcount = desc->maxcount;
+        (void)maxcount; // used in assert
 
         Anchor oldAnchor = desc->anchor.load();
         Anchor newAnchor;

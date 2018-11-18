@@ -14,50 +14,50 @@
 
 #define STATIC_ASSERT(x, m) static_assert(x, m)
 
-#define lf_malloc malloc
-#define lf_free free
-#define lf_calloc calloc
-#define lf_realloc realloc
-#define lf_malloc_usable_size malloc_usable_size
-#define lf_posix_memalign posix_memalign
-#define lf_aligned_alloc aligned_alloc
-#define lf_valloc valloc
-#define lf_memalign memalign
-#define lf_pvalloc pvalloc
+#define lr_malloc malloc
+#define lr_free free
+#define lr_calloc calloc
+#define lr_realloc realloc
+#define lr_malloc_usable_size malloc_usable_size
+#define lr_posix_memalign posix_memalign
+#define lr_aligned_alloc aligned_alloc
+#define lr_valloc valloc
+#define lr_memalign memalign
+#define lr_pvalloc pvalloc
 
 // called on process init/exit
-void lf_malloc_initialize();
-void lf_malloc_finalize();
+void lr_malloc_initialize();
+void lr_malloc_finalize();
 // called on thread enter/exit
-void lf_malloc_thread_initialize();
-void lf_malloc_thread_finalize();
+void lr_malloc_thread_initialize();
+void lr_malloc_thread_finalize();
 
 // exports
 extern "C"
 {
     // malloc interface
-    void* lf_malloc(size_t size) noexcept
+    void* lr_malloc(size_t size) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW LFMALLOC_ALLOC_SIZE(1);
-    void lf_free(void* ptr) noexcept
+    void lr_free(void* ptr) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW;
-    void* lf_calloc(size_t n, size_t size) noexcept
+    void* lr_calloc(size_t n, size_t size) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW LFMALLOC_ALLOC_SIZE2(1, 2);
-    void* lf_realloc(void* ptr, size_t size) noexcept
+    void* lr_realloc(void* ptr, size_t size) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW LFMALLOC_ALLOC_SIZE(2);
     // utilities
-    size_t lf_malloc_usable_size(void* ptr) noexcept;
+    size_t lr_malloc_usable_size(void* ptr) noexcept;
     // memory alignment ops
-    int lf_posix_memalign(void** memptr, size_t alignment, size_t size) noexcept
+    int lr_posix_memalign(void** memptr, size_t alignment, size_t size) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW LFMALLOC_ATTR(nonnull(1))
         LFMALLOC_ALLOC_SIZE(3);
-    void* lf_aligned_alloc(size_t alignment, size_t size) noexcept
+    void* lr_aligned_alloc(size_t alignment, size_t size) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW LFMALLOC_ALLOC_SIZE(2);
-    void* lf_valloc(size_t size) noexcept
+    void* lr_valloc(size_t size) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW LFMALLOC_ALLOC_SIZE(1);
     // obsolete alignment oos
-    void* lf_memalign(size_t alignment, size_t size) noexcept
+    void* lr_memalign(size_t alignment, size_t size) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW LFMALLOC_ALLOC_SIZE(2);
-    void* lf_pvalloc(size_t size) noexcept
+    void* lr_pvalloc(size_t size) noexcept
         LFMALLOC_EXPORT LFMALLOC_NOTHROW LFMALLOC_ALLOC_SIZE(1);
 }
 
@@ -86,9 +86,9 @@ struct SizeClassData;
 struct Anchor
 {
     uint64_t state : 2;
-    uint64_t avail : 15;
-    uint64_t count : 15;
-    uint64_t tag : 32;
+    uint64_t avail : 25;
+    uint64_t count : 25;
+    uint64_t tag : 12;
 } LFMALLOC_ATTR(packed);
 
 STATIC_ASSERT(sizeof(Anchor) == sizeof(uint64_t), "Invalid anchor size");

@@ -1,5 +1,6 @@
 
 #include <sys/mman.h>
+#include <errno.h>
 
 #include "pages.h"
 #include "log.h"
@@ -34,6 +35,9 @@ void PageFree(void* ptr, size_t size)
     ASSERT((size & PAGE_MASK) == 0);
 
     int ret = munmap(ptr, size);
+    (void)ret; // suppress unused variable warning
+    int err = errno;
+    (void)err;
     ASSERT(ret == 0);
 }
 
